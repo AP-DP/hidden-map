@@ -14,6 +14,8 @@ class HiddenMap {
         this.height = 400;
         // Data variables
         this.trailPath = [];
+        this.otherPaths = [];
+        this.lastCoordinate = 0;
         // Draw
         let self = this;
         // P5 function
@@ -40,10 +42,23 @@ class HiddenMap {
                 // Add new mouse-located ellipse to masking layer
                 self.maskingLayer.fill('rgba(0, 0, 0, 1)');
                 self.maskingLayer.ellipse(p.mouseX, p.mouseY, 80, 80);
+                for (let i = self.lastCoordinate; i < self.otherPaths.length; i++) {
+                    let coordinate = self.otherPaths[i];
+                    self.maskingLayer.ellipse(coordinate[0], coordinate[1], 80, 80);
+                    self.lastCoordinate += 1;
+                }
                 // Copy bg image and apply mask
                 ( this.maskedBackground = self.backgroundImg.get() ).mask( self.maskingLayer.get() );
                 // Display masked image
                 p.image(this.maskedBackground, 0, 0, self.width, self.height);
+            }
+
+            p.mouseDragged = function() {
+                let mouseX = p.mouseX;
+                let mouseY = p.mouseY;
+                //***************/
+                sendMessage('mouse', {x: mouseX, y: mouseY});
+                //***************/
             }
         }
     }
@@ -58,5 +73,11 @@ class HiddenMap {
      */
     getTrailCoordinates() {
         return this.trailPath;
+    }
+    /**
+     * Add other user draw path
+     */
+    collabDraw(data) {
+        this.otherPaths.push([data.x, data.y]);
     }
 }
