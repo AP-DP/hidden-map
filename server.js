@@ -1,8 +1,13 @@
 'use strict';
 
-// Load packages
+// Load functions from other modules
+const { initIO } = require('./socket');
+
+// Load packages and set up server
 const express = require('express');
 const app = express();
+const server = require('http').createServer(app);
+const io = initIO(server);
 
 // Connection variables
 const PORT = 8080;
@@ -20,5 +25,9 @@ app.use('/', express.static('pages'));
 app.use('/', express.static('src'));
 app.use('/', express.static('assets'));
 
-app.listen(PORT, HOST);
-console.log('Server up and running');
+server.listen(PORT, () => {
+    console.log('Server up and running');
+})
+
+// app.listen(PORT, HOST);
+// console.log('Server up and running');
