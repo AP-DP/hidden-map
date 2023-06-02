@@ -13,6 +13,11 @@ function initIO(server) {
     //Handle connection
     io.on('connection', (socket) => {
         console.log('a user connected: ' + socket.id);
+        socket.emit("test-event");
+        socket.on('mouse', (data) => {
+            socket.broadcast.emit('mouse', data);
+        })
+    
     });
 
     return io;
