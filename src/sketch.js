@@ -5,7 +5,10 @@ class HiddenMap {
     /**
      * Pass <div> id as container
      */
-    constructor(container) {
+    constructor(container, model, controller) {
+        // MVC variables
+        this.model = model;
+        this.controller = controller;
         // View variables
         this.backgroundImg;
         this.maskingLayer;
@@ -57,7 +60,7 @@ class HiddenMap {
                 let mouseX = p.mouseX;
                 let mouseY = p.mouseY;
                 //***************/
-                sendMessage('mouse', {x: mouseX, y: mouseY});
+                controller.sendMessage('mouse', {x: mouseX, y: mouseY});
                 //***************/
             }
         }
@@ -79,5 +82,11 @@ class HiddenMap {
      */
     collabDraw(data) {
         this.otherPaths.push([data.x, data.y]);
+    }
+    /**
+     * Update local variables from model
+     */
+    update() {
+        console.log("Updating");
     }
 }
