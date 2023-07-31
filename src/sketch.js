@@ -80,13 +80,24 @@ class HiddenMap {
     /**
      * Add other user draw path
      */
-    collabDraw(data) {
-        this.otherPaths.push([data.x, data.y]);
+    collabDraw() {
+        let collaborators = this.model.getCollaborators();
+        for (let i=0; i < collaborators.length; i++) {
+            let id = collaborators[i];
+            let pathData = this.model.getCollaboratorPath(id)
+            let colour = pathData.colour;
+            let coordinates = pathData.path;
+            let coordinate = coordinates.slice(-1)[0];
+            if (coordinate != undefined) {
+                this.otherPaths.push([coordinate.x, coordinate.y]);
+            }
+        }
     }
     /**
      * Update local variables from model
      */
     update() {
         console.log("Updating");
+        this.collabDraw()
     }
 }
