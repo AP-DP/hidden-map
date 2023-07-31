@@ -15,18 +15,41 @@ function initIO(server) {
 
     //Handle connection
     io.on('connection', (socket) => {
-        console.log('a user connected: ' + socket.id);
-        io.emit("new-user", socket.id);
+        let socketID = socket.id;
+        // Register new connection
+        console.log('a user connected: ' + socketID);
+        io.emit("new-user", socketID);
+        // Alert existing users about new connection
         for (const [key, value] of Object.entries(users)) {
             console.log(key);
             socket.emit("new-user", key);
         }
-        users[socket.id] = lastUsedID;
+        // After alerting existing users, update user tracker
+        users[socketID] = lastUsedID;
         lastUsedID++;
-        socket.emit("test-event");
+        // Mouse data event
         socket.on('mouse', (data) => {
             socket.broadcast.emit('mouse', data);
         })
+        // Remove user after they disconnect
+        socket.on('disconnect', () => {
+            console.log('User disconnected');
+            // Make a new object with all users but the one that disconnected
+            // Avoid editing teh object directly
+            let userkeys = Object.keys(users);
+            let remainingUserKeys = userkeys.filter((userID) => {
+                return userID !== socketID;
+            });
+            let remainingUsers = {};
+            for (let i=0; i < remainingUserKeys.length; i++) {
+                let key = remainingUserKeys[i];
+                let value = users[key];
+                remainingUsers[key] = value;
+            }
+            // Assign new object to variable
+            users = remainingUsers;
+            socket.broadcast.emit('disconnected', socketID);
+        });
     });
 
     return io;
