@@ -137,7 +137,7 @@ class Model {
      * @returns Object containing path data
      */
     getCollaboratorPath(id) {
-        // {colour: HEX, path: [{x: coordinate, y: coordinate}]}
+        // {colour: [r, g, b], path: [{x: coordinate, y: coordinate}]}
         return this.collaboratorPaths[id];
     }
     /**
