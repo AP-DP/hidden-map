@@ -18,6 +18,7 @@ class HiddenMap {
         // Data variables
         this.trailPath = [];
         this.otherPaths = [];
+        this.pathColours = [];
         this.lastCoordinate = 0;
         // Draw
         let self = this;
@@ -51,9 +52,17 @@ class HiddenMap {
                     self.lastCoordinate += 1;
                 }
                 // Copy bg image and apply mask
-                ( this.maskedBackground = self.backgroundImg.get() ).mask( self.maskingLayer.get() );
+                ( self.maskedBackground = self.backgroundImg.get() ).mask( self.maskingLayer.get() );
                 // Display masked image
-                p.image(this.maskedBackground, 0, 0, self.width, self.height);
+                p.image(self.maskedBackground, 0, 0, self.width, self.height);
+                // Show other user paths
+                for (let j = 0; j < self.otherPaths.length; j++) {
+                    let rgb = self.pathColours[j];
+                    p.fill(`rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.1)`)
+                    p.noStroke();
+                    let coordinate = self.otherPaths[j];
+                    p.ellipse(coordinate[0], coordinate[1], 100, 100);
+                }
             }
 
             p.mouseDragged = function() {
@@ -88,8 +97,31 @@ class HiddenMap {
             let colour = pathData.colour;
             let coordinates = pathData.path;
             let coordinate = coordinates.slice(-1)[0];
+            // Check if collaborator has already shared that location
             if (coordinate != undefined) {
-                this.otherPaths.push([coordinate.x, coordinate.y]);
+                let hitMatch = false;
+                let hitRange = 15;
+                let index = 0;
+                let maxIndex = this.otherPaths.length - 1;
+                // Check for coordinate close enough to a recorded coordinate
+                // and check for collaborator match based on colour
+                while (!hitMatch && index <= maxIndex) {
+                    let testCoordinate = this.otherPaths[index];
+                    if (Math.abs(testCoordinate[0] - coordinate.x) < hitRange) {
+                        if (Math.abs(testCoordinate[1] - coordinate.y) < hitRange) {
+                            if (colour == this.pathColours[index]) {
+                                hitMatch = true;
+                            }
+                        }
+                    }
+                    index++;
+                }
+                // If collaborator has not previously shared that location,
+                // add to tracked collaborator paths
+                if (!hitMatch) {
+                    this.otherPaths.push([coordinate.x, coordinate.y]);
+                    this.pathColours.push(colour);
+                }
             }
         }
     }
